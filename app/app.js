@@ -1,41 +1,69 @@
-const express = require("express");
-const router = require("../router/router");
+//use express
+const express = require('express');
 const app = express();
+//use morgan
+const morgan = require('morgan');
+//use mongoose
+const mongoose = require('mongoose');
 
-// middleware
+//middleware for logging
+app.use(morgan('dev'));
+
+//parsing middleware
+app.use(express.urlencoded({ extended: true}));
+
+//middleware that all requests are json
 app.use(express.json());
 
-//default service call
-app.get("/", (req,res,next)=>{
-    res.status(200).json({
-        message: "Service is up",
-    })
+app.get("/",(req,res) => {
+    res.status(201).json({
+        message:"Service is up and running",
+        method: req.method});
+} );
+
+//middleware to handle the CORS policy
+app.use((req,res,next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+
+    if(req.method === 'OPTIONS'){
+        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+    }
+    next();
 })
 
-app.patch("/", (req,res,next)=>{
-    res.status(200).json({
-        message: "Patch is working",
-    })
-})
+//use artist router
+const artistRouter = require('../api/routes/artist');
+app.use('/artists', artistRouter);
 
+//use painting router
+const paintingRouter = require('../api/routes/painting');
+app.use('/paintings', paintingRouter);
 
-//localhost:3000/example
-app.use("/example", router);
-
-//add middleware to add error and bad url
-app.use((req,res,next)=>{
-    const error = new Error("Not Found");
+//error handling middleware using arrow functions
+app.use((err, req, res, next) => {
+    const error = new Error("NOT FOUND!!!");
     error.status = 404;
     next(error);
+} );
+
+app.use((err, req, res, next) => {
+    res.status(err.status || 500).json({
+        error:{
+            message: err.message,
+            status: err.status
+        }
+    });
 });
 
-app.use((error, req, res, next)=>{
-    res.status(error.status || 500).json({
-        error:{
-            message: error.message,
-            status: error.status,
-        }
-    })
-})
+//connect to mongodb
+mongoose.connect(process.env.mongoDBURL, (err) => {
+    if(err){
+        console.log(err);
+    }else{
+        console.log("Connected to mongodb");
+    }
+});
 
-module.exports = app; 
+//export
+module.exports = app;
