@@ -18,7 +18,7 @@ app.patch("/", (req,res,next)=>{
     })
 })
 
-//cors
+
 //localhost:3000/example
 app.use("/example", router);
 
