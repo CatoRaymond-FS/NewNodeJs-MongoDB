@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 //use morgan
 const morgan = require('morgan');
+//import dotenv
+require('dotenv').config();
 //use mongoose
 const mongoose = require('mongoose');
 
