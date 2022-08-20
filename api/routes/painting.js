@@ -9,6 +9,40 @@ router.get("/", (req, res, next) => {
     res.json({
         message: "Painting - GET"
     })
+    const updatedPainting = {
+        title: req.body.title,
+        artist: req.body.artist,
+        year: req.body.year,
+    }
+
+    Painting.updateOne({
+        _id: paintingis
+    },{
+        $set: updatedPainting
+    }).then(result => {
+        res.status(200).json({
+            message: "Painting updated",
+            painting: {
+                title: result.title,
+                artist: result.artist,
+                year: result.year,
+                id: result._id
+            },
+            metadata: {
+                host: req.hostname,
+                method: req.method
+            }
+    })
+    }).catch(err => {
+        res.status(500).json({
+            error: {
+                message: err.message
+            }
+        })
+    }
+    )
+
+   
 });
 
 //post
