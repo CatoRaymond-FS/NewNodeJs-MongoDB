@@ -37,7 +37,7 @@ app.use((req,res,next) => {
 
 //use painting router
 const paintingRouter = require('../api/routes/painting');
-app.use('/paintings', paintingRouter);
+app.use('/painting', paintingRouter);
 
 //error handling middleware using arrow functions
 app.use((err, req, res, next) => {

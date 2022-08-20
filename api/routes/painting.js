@@ -1,48 +1,44 @@
 //use express
 const express = require("express");
+const { default: mongoose } = require("mongoose");
 
 //use router
 const router = express.Router();
 
 //get
 router.get("/", (req, res, next) => {
-    res.json({
-        message: "Painting - GET"
-    })
-    const updatedPainting = {
+    const newPainting = new Painting({
         title: req.body.title,
         artist: req.body.artist,
         year: req.body.year,
-    }
+        _id: mongoose.Types.ObjectId()
+    });
 
-    Painting.updateOne({
-        _id: paintingis
-    },{
-        $set: updatedPainting
-    }).then(result => {
-        res.status(200).json({
-            message: "Painting updated",
-            painting: {
-                title: result.title,
-                artist: result.artist,
-                year: result.year,
-                id: result._id
-            },
-            metadata: {
-                host: req.hostname,
-                method: req.method
-            }
-    })
-    }).catch(err => {
-        res.status(500).json({
-            error: {
-                message: err.message
-            }
-        })
-    }
+    newPainting.save()
+        .then((result => {
+            res.status(201).json({
+                message: "Painting created successfully",
+                createdPainting: {
+                    title: result.title,
+                    artist: result.artist,
+                    year: result.year,
+                    _id: result._id,
+                    metadata: {
+                        method: req.medhod,
+                        host: req.hostname
+                    }
+                }
+            })
+        }
+        ))
+        .catch(err => {
+            res.status(500).json({
+                error: {
+                    message: err.message
+                }
+            })
+        }
     )
-
-   
 });
 
 //post
