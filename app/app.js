@@ -34,9 +34,6 @@ app.use((req,res,next) => {
     next();
 })
 
-//use artist router
-const artistRouter = require('../api/routes/artist');
-app.use('/artists', artistRouter);
 
 //use painting router
 const paintingRouter = require('../api/routes/painting');
