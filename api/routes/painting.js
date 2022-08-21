@@ -5,74 +5,134 @@ const { default: mongoose } = require("mongoose");
 //use router
 const router = express.Router();
 
+//use Painting model
+const Painting = require("../models/painting");
+
+
 //get
 router.get("/", (req, res, next) => {
-    const newPainting = new Painting({
-        title: req.body.title,
-        artist: req.body.artist,
-        year: req.body.year,
-        _id: mongoose.Types.ObjectId()
-    });
+    Painting.find()
+        .then(paintings => {
+            res.status(200).json({
+                message: "Paintings created successfully!",
+                createdPainting: {
+                    title: paintings.title,
+                    artist: paintings.artist,
+                    year: paintings.year,
+                    _id: paintings._id
+                }
+            });
+        }).catch(err => {
+            res.status(500).json({
+                error: err
+            });
+        }
+        );
+});
+//post
+router.post("/", (req, res, next) => {
+   const newPainting = new Painting({
+         _id: new mongoose.Types.ObjectId(),
+            title: req.body.title,
+            artist: req.body.artist,
+            year: req.body.year
+   })
 
-    newPainting.save()
-        .then((result => {
+   newPainting.save()
+        .then(result => {
+            console.log(result);
             res.status(201).json({
-                message: "Painting created successfully",
+                message: "Painting created successfully!",
                 createdPainting: {
                     title: result.title,
                     artist: result.artist,
                     year: result.year,
                     _id: result._id,
                     metadata: {
-                        method: req.medhod,
+                        method: req.method,
                         host: req.hostname
                     }
                 }
             })
-        }
-        ))
-        .catch(err => {
-            res.status(500).json({
-                error: {
-                    message: err.message
-                }
-            })
-        }
-    )
-});
-
-//post
-router.post("/", (req, res, next) => {
-    res.json({
-        message: "Painting - POST"
-    })
+        })
+            .catch(err => {
+                res.status(500).json({
+                    error: {
+                        message: err.message
+                    }
+                })
+          });
 });
 
 //Get by id
 router.get("/:id", (req, res, next) => {
     const paintingId = req.params.id;
-    res.json({
-        message: "Painting - GET by id",
-        id: paintingId
-    })
+    Painting.findById(paintingId)
+        .then(painting => {
+            res.status(200).json({
+                message: "Painting found!",
+                painting: painting
+            });
+        }
+        ).catch(err => {
+            res.status(500).json({
+                error: {
+                    message: err.message
+                }
+            });
+        });
 });
+
+
 
 //patch
 router.patch("/:id", (req, res, next) => {
     const paintingId = req.params.id;
-    res.json({
-        message: "Painting - PATCH",
-        id: paintingId
-    })
+    //patch by id
+    Painting.updateOne({
+        _id: paintingId
+    }, {
+        $set: {
+            title: req.body.title
+        }
+    }).then(result => {
+        res.status(200).json({
+            message: "Painting updated successfully!",
+            painting: {
+                title: result.title,
+                artist: result.artist,
+                year: result.year,
+                _id: result._id
+            }
+        })
+    }).catch(err => {
+        res.status(500).json({
+            error: {
+                message: err.message
+            }
+        });
+    }
+    );
 });
 
 //delete
 router.delete("/:id", (req, res, next) => {
     const paintingId = req.params.id;
-    res.json({
-        message: "Painting - DELETE",
-        id: paintingId
-    })
+    Painting.deleteOne({ _id: paintingId })
+        .then(result => {
+            res.status(200).json({
+                message: "Painting deleted successfully!",
+                result: result
+            });
+        }
+        ).catch(err => {
+            res.status(500).json({
+                error: {
+                    message: err.message
+                }
+            });
+        }
+        );
 });
 
 //export
