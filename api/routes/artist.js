@@ -61,3 +61,85 @@ router.delete("/:artistId", (req,res,next) => {
     })
 
 });
+
+//update by id
+router.patch("/:artistId", (req,res,next) => {
+    const artistId = req.params.artistId;
+    const updateOps = {};
+    for(const ops of req.body){
+        updateOps[ops.propName] = ops.value;
+    }
+    Artist.updateOne({
+        _id: artistId
+    }, {
+        $set: updateOps
+    }).exec()
+    .then(result => {
+        res.status(200).json({
+            message: messages.artist_updated,
+            request: {
+                method: "PATCH",
+                url: "http://localhost:3003/api/artists/" + artistId
+            }
+        })
+    }).catch(err => {
+        res.status(500).json({
+            error: {
+                message: err.message
+            }
+        })
+    })
+});
+
+//create new artist
+router.post("/", (req,res,next) => {
+    const artist = new Artist({
+        _id: new mongoose.Types.ObjectId(),
+        name: req.body.name
+    });
+    artist.save()
+    .then(result => {
+        res.status(201).json({
+            message: messages.artist_created,
+            createdArtist: {
+                name: result.name,
+                _id: result._id,
+                painting: result.painting
+            },
+            request: {
+                method: "POST",
+                url: "http://localhost:3003/api/artists/" + result._id
+            }
+        })
+    }).catch(err => {
+        res.status(500).json({
+            error: {
+                message: err.message
+            }
+        })
+    })
+});
+
+
+//get
+router.get("/", (req,res,next) => {
+    Artist.find()
+    .select("name _id")
+    .populate("painting", "title _id")
+    .exec()
+    .then(artists => {
+        res.status(200).json({
+            artists: artists,
+            message: messages.artist_found
+        })
+    }).catch(err => {
+        res.status(500).json({
+            error: {
+                message: err.message
+            }
+        })
+    }
+    )
+});
+
+module.exports = router;

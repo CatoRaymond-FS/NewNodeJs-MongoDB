@@ -39,6 +39,10 @@ app.use((req,res,next) => {
 const paintingRouter = require('../api/routes/painting');
 app.use('/painting', paintingRouter);
 
+//use artist router
+const artistRouter = require('../api/routes/artist');
+app.use('/artist', artistRouter);
+
 //error handling middleware using arrow functions
 app.use((req, res, next) => {
     const error = new Error("NOT FOUND!!!");
