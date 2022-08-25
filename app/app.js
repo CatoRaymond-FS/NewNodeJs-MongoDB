@@ -40,7 +40,7 @@ const paintingRouter = require('../api/routes/painting');
 app.use('/painting', paintingRouter);
 
 //error handling middleware using arrow functions
-app.use((err, req, res, next) => {
+app.use((req, res, next) => {
     const error = new Error("NOT FOUND!!!");
     error.status = 404;
     next(error);

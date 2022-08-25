@@ -4,8 +4,15 @@ const mongoose = require("mongoose");
 //create schema for artist
 const artistSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    name: String,
-    painting: String,
+    painting: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Painting",
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+    }
 });
 
 //export

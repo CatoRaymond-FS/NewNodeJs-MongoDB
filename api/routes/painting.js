@@ -15,12 +15,13 @@ router.get("/", (req, res, next) => {
         .then(paintings => {
             res.status(200).json({
                 message: "Paintings created successfully!",
-                createdPainting: {
-                    title: paintings.title,
-                    artist: paintings.artist,
-                    year: paintings.year,
-                    _id: paintings._id
-                }
+                createdPaintings: paintings.map(painting =>{
+                    return {
+                        title: painting.title,
+                        artist: painting.artist,
+                        year: painting.year,
+                    }
+                })
             });
         }).catch(err => {
             res.status(500).json({
@@ -93,17 +94,14 @@ router.patch("/:id", (req, res, next) => {
         _id: paintingId
     }, {
         $set: {
-            title: req.body.title
+            title: req.body.title,
+            artist: req.body.artist,
+            year: req.body.year
         }
     }).then(result => {
         res.status(200).json({
             message: "Painting updated successfully!",
-            painting: {
-                title: result.title,
-                artist: result.artist,
-                year: result.year,
-                _id: result._id
-            }
+            result: result,
         })
     }).catch(err => {
         res.status(500).json({
