@@ -7,6 +7,11 @@ const router = express.Router();
 
 //import messages
 const messages = require("../../messages/messages");
+const { default: mongoose } = require("mongoose");
+const painting = require("../models/painting");
+const { ObjectId } = require("bson");
+
+
 
 
 //get by id
@@ -62,18 +67,15 @@ router.delete("/:artistId", (req,res,next) => {
 
 });
 
-//update by id
+//patch by id
 router.patch("/:artistId", (req,res,next) => {
     const artistId = req.params.artistId;
-    const updateOps = {};
-    for(const ops of req.body){
-        updateOps[ops.propName] = ops.value;
-    }
     Artist.updateOne({
         _id: artistId
     }, {
-        $set: updateOps
-    }).exec()
+        $set: req.body
+    })
+    .exec()
     .then(result => {
         res.status(200).json({
             message: messages.artist_updated,
@@ -82,7 +84,8 @@ router.patch("/:artistId", (req,res,next) => {
                 url: "http://localhost:3003/api/artists/" + artistId
             }
         })
-    }).catch(err => {
+    })
+    .catch(err => {
         res.status(500).json({
             error: {
                 message: err.message
@@ -91,11 +94,14 @@ router.patch("/:artistId", (req,res,next) => {
     })
 });
 
+
+
 //create new artist
 router.post("/", (req,res,next) => {
     const artist = new Artist({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name
+        name: req.body.name,
+        painting: ObjectId(painting._id),
+        _id: new mongoose.Types.ObjectId
     });
     artist.save()
     .then(result => {
@@ -103,8 +109,8 @@ router.post("/", (req,res,next) => {
             message: messages.artist_created,
             createdArtist: {
                 name: result.name,
-                _id: result._id,
-                painting: result.painting
+                painting: result.painting,
+                _id: result._id
             },
             request: {
                 method: "POST",
@@ -119,6 +125,7 @@ router.post("/", (req,res,next) => {
         })
     })
 });
+
 
 
 //get
