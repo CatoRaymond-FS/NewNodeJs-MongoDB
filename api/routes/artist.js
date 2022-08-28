@@ -28,8 +28,10 @@ router.get("/:artistId", (req,res,next) => {
                 message: messages.artist_not_found
             })
         }
-        res.status(200).json({
-            artist: artist
+        res.status(201).json({
+            artist: artist,
+            message: messages.artist_found
+
         })
 })
     .catch(err => {
@@ -48,7 +50,7 @@ router.delete("/:artistId", (req,res,next) => {
     })
     .exec()
     .then(result => {
-        res.status(200).json({
+        res.status(201).json({
             message: messages.artist_deleted,
             request: {
                 method: "DELETE",
@@ -77,7 +79,7 @@ router.patch("/:artistId", (req,res,next) => {
     })
     .exec()
     .then(result => {
-        res.status(200).json({
+        res.status(201).json({
             message: messages.artist_updated,
             request: {
                 method: "PATCH",
@@ -135,7 +137,7 @@ router.get("/", (req,res,next) => {
     .populate("painting", "title _id")
     .exec()
     .then(artists => {
-        res.status(200).json({
+        res.status(201).json({
             artists: artists,
             message: messages.artist_found
         })
